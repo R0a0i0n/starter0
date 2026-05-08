@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.ExecutionApp" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- 启动页专属主题 -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- 启动页背景色 -->
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <!-- 启动页中间显示的 Logo 图标 -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo_padded</item>
+        <!-- 启动结束后恢复到 App 正常的主题 -->
+        <item name="postSplashScreenTheme">@style/Theme.ExecutionApp</item>
+    </style>
 </resources>

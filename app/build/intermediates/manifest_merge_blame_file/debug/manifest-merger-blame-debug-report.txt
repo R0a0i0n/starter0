@@ -1,8 +1,8 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.example.executionapp"
-4    android:versionCode="1"
-5    android:versionName="1.0" >
+4    android:versionCode="2"
+5    android:versionName="0.1.2" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="26"
@@ -43,16 +43,16 @@
 27        android:extractNativeLibs="false"
 28        android:fullBackupContent="@xml/backup_rules"
 28-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:13:9-54
-29        android:icon="@mipmap/ic_launcher"
-29-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:14:9-43
+29        android:icon="@drawable/starter_logo_with_bg"
+29-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:14:9-54
 30        android:label="@string/app_name"
 30-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:15:9-41
-31        android:roundIcon="@mipmap/ic_launcher_round"
-31-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:16:9-54
+31        android:roundIcon="@drawable/starter_logo_with_bg"
+31-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:16:9-59
 32        android:supportsRtl="true"
 32-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:17:9-35
 33        android:testOnly="true"
-34        android:theme="@style/Theme.ExecutionApp" >
+34        android:theme="@style/Theme.App.Starting" >
 34-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:18:9-50
 35        <activity
 35-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:20:9-29:20
@@ -62,7 +62,7 @@
 37-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:22:13-36
 38            android:screenOrientation="portrait"
 38-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:23:13-49
-39            android:theme="@style/Theme.ExecutionApp" >
+39            android:theme="@style/Theme.App.Starting" >
 39-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:24:13-54
 40            <intent-filter>
 40-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:25:13-28:29

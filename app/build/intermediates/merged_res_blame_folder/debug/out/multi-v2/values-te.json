@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.executionapp-mergeDebugResources-55:/values-te/values-te.xml",
+            "outputFile": "com.example.executionapp-mergeDebugResources-56:/values-te/values-te.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Eternity\\.gradle\\caches\\transforms-3\\7d7c0deab91643ec6957a623e65742d4\\transformed\\material3-release\\res\\values-te\\values-te.xml",

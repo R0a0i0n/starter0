@@ -49,6 +49,7 @@ MERGED from [androidx.core:core-ktx:1.12.0] C:\Users\Eternity\.gradle\caches\tra
 MERGED from [androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:17:1-31:12
 MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0069fda4e0fcaf355bb10f3e6b3cf479\transformed\room-ktx-2.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\Eternity\.gradle\caches\transforms-3\477fc0ec0e5116dd12887c0ca231dd93\transformed\datastore-preferences-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\Eternity\.gradle\caches\transforms-3\a52b975357d56e24ebda6e66495fb451\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Eternity\.gradle\caches\transforms-3\2ee6f8c5a293a918ecd77969023d5700\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Eternity\.gradle\caches\transforms-3\ad56fa3af6f6ed88ef6c09df4624cf3c\transformed\sqlite-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.datastore:datastore:1.0.0] C:\Users\Eternity\.gradle\caches\transforms-3\dc81be76965e9b7d93885b8da7d47a4d\transformed\datastore-1.0.0\AndroidManifest.xml:17:1-24:12
@@ -115,11 +116,11 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Eternity\.gradle\c
 	android:fullBackupContent
 		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:13:9-54
 	android:roundIcon
-		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:16:9-54
+		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:16:9-59
 	tools:targetApi
 		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:19:9-29
 	android:icon
-		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:14:9-43
+		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:14:9-54
 	android:allowBackup
 		ADDED from S:\rolling_start\starter\app\src\main\AndroidManifest.xml:11:9-35
 	android:theme
@@ -242,6 +243,8 @@ MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Eternity\.gradle\caches\tran
 MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0069fda4e0fcaf355bb10f3e6b3cf479\transformed\room-ktx-2.6.1\AndroidManifest.xml:20:5-44
 MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\Eternity\.gradle\caches\transforms-3\477fc0ec0e5116dd12887c0ca231dd93\transformed\datastore-preferences-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\Eternity\.gradle\caches\transforms-3\477fc0ec0e5116dd12887c0ca231dd93\transformed\datastore-preferences-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\Eternity\.gradle\caches\transforms-3\a52b975357d56e24ebda6e66495fb451\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\Eternity\.gradle\caches\transforms-3\a52b975357d56e24ebda6e66495fb451\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Eternity\.gradle\caches\transforms-3\2ee6f8c5a293a918ecd77969023d5700\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Eternity\.gradle\caches\transforms-3\2ee6f8c5a293a918ecd77969023d5700\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Eternity\.gradle\caches\transforms-3\ad56fa3af6f6ed88ef6c09df4624cf3c\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44

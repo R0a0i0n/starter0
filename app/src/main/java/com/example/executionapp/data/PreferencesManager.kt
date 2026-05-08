@@ -18,7 +18,19 @@ class PreferencesManager(private val context: Context) {
     companion object {
         val PRE_INPUT_KEY = stringPreferencesKey("pre_input")
         val AB_TEST_GROUP_KEY = booleanPreferencesKey("ab_test_group")
+        val SHOW_WELCOME_DIALOG_KEY = booleanPreferencesKey("show_welcome_dialog")
+        val HAS_SWIPED_CARD_KEY = booleanPreferencesKey("has_swiped_card")
     }
+
+    val hasSwipedCardFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[HAS_SWIPED_CARD_KEY] ?: false
+        }
+
+    val showWelcomeDialogFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[SHOW_WELCOME_DIALOG_KEY] ?: true
+        }
 
     val preInputFlow: Flow<String> = context.dataStore.data
         .map { preferences ->
@@ -33,6 +45,18 @@ class PreferencesManager(private val context: Context) {
     suspend fun savePreInput(preInput: String) {
         context.dataStore.edit { preferences ->
             preferences[PRE_INPUT_KEY] = preInput
+        }
+    }
+
+    suspend fun setDontShowWelcomeDialog() {
+        context.dataStore.edit { preferences ->
+            preferences[SHOW_WELCOME_DIALOG_KEY] = false
+        }
+    }
+
+    suspend fun setHasSwipedCard() {
+        context.dataStore.edit { preferences ->
+            preferences[HAS_SWIPED_CARD_KEY] = true
         }
     }
 

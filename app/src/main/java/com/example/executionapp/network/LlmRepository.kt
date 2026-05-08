@@ -22,7 +22,7 @@ class LlmRepository(private val apiService: LlmApiService) {
     }
 
     suspend fun validateGoal(goal: String, currentAction: String, resistance: String): Result<String> {
-        val systemPrompt = "你是一个目标合理性检验助手。请对用户的目标提出具体的修改意见，让它更清晰、更易于执行。哪怕目标已经不错，你也必须给出一个修改版。直接回复修改版的内容，不要有其他废话，不要以'建议修改为：'开头。"
+        val systemPrompt = "你是一个目标合理性检验助手。请对用户的目标提出具体的修改意见，让它更清晰、更易于执行。注意：在优化目标时，绝对不能涉及任何与现实具体时间（如几点去做什么）相关的内容。哪怕目标已经不错，你也必须给出一个修改版。直接回复修改版的内容，不要有其他废话，不要以'建议修改为：'开头。"
         val userPrompt = "目标：$goal\n当前在做：$currentAction\n阻力：$resistance"
         return executeChat(systemPrompt, userPrompt)
     }
@@ -43,14 +43,20 @@ class LlmRepository(private val apiService: LlmApiService) {
             append("【角色】你是“滚雪球执行力教练”，负责将大目标拆解为极小、极易完成的动作。\n")
             append("【任务】基于用户的大目标：$goal，以及当前正在做的动作：$currentAction。")
             if (preInput.isNotBlank()) append(" 结合用户的预输入偏好：$preInput。")
-            append("让新旧动作无缝重叠，提供下一步的小任务。")
+            append("提供下一步的小任务。\n")
+            append("【核心规则】\n")
+            append("1. 每个小目标要有区别，体现循序渐进一步一步达成。\n")
+            append("2. 每一步和上一步必须有新内容，绝不能重复。\n")
+            append("3. 一定要把用户输入的大目标设定为六步做完之后才能达成的，绝不能一开始就让用户直接完成大目标。\n")
             if (isFinalStep) {
-                append("这是第6步，也是最后一步。请引导用户完成最终的目标动作。")
+                append("这是第6步，也是最后一步。请引导用户完成最终的目标动作。\n")
+            } else {
+                append("当前不是最后一步，仅提供当前的过渡性小任务。\n")
             }
-            append("\n【格式】强制输出可执行的动作清单，绝对禁止任何抽象的建议或鼓励话语。")
+            append("【格式】绝对禁止任何前置铺垫（如'基于您的反馈'）、背景说明或鼓励话语。不要分条列点（不要出现1. 2. 3.）。请将内容压缩在50字以内，输出一段简洁无冗余的指令文本，只包含具体要做什么。")
             
             if (isTestGroup) {
-                append("请给出 1条可在 10 分钟内落地的具体动作，不说废话。")
+                append("（测试组追加要求：确保该动作可在10分钟内落地，绝对不含废话）")
             }
         }
         
@@ -62,11 +68,11 @@ class LlmRepository(private val apiService: LlmApiService) {
                 }
             }
             if (isReplace) {
-                append("用户对你上一次给的步骤选择了“换一个”。")
+                append("用户对上一个步骤选择了“换一个”。")
                 if (!replaceReason.isNullOrBlank()) {
-                    append(" 用户的困难/原因是：$replaceReason。")
+                    append(" 困难是：$replaceReason。")
                 }
-                append("请根据以上信息，重新生成当前步骤，换一种更简单或更合适的做法。")
+                append("请重新生成当前步骤。")
             } else {
                 append("请给出下一步的小任务。")
             }

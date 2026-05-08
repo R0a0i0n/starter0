@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.executionapp-mergeDebugResources-55:/values-gu/values-gu.xml",
+            "outputFile": "com.example.executionapp-mergeDebugResources-56:/values-gu/values-gu.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Eternity\\.gradle\\caches\\transforms-3\\beb2c746447cbc0ae4b924dcc0008900\\transformed\\ui-release\\res\\values-gu\\values-gu.xml",

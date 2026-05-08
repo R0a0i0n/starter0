@@ -1,6 +1,8 @@
 package com.example.executionapp.ui
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalConfiguration
@@ -19,9 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -29,10 +34,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextIndent
 import com.example.executionapp.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -44,17 +47,27 @@ fun CardScreen(viewModel: MainViewModel) {
     val isLoading by viewModel.isLoading.collectAsState()
     val elapsedMillis by viewModel.elapsedMillis.collectAsState()
 
+    val hasSwipedCard by viewModel.hasSwipedCard.collectAsState()
+
     var showReplaceDialog by remember { mutableStateOf(false) }
     var replaceReason by remember { mutableStateOf("") }
 
     val offsetY = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(hasSwipedCard, currentStep) {
+        if (!hasSwipedCard && currentStep != null) {
+            delay(500)
+            offsetY.animateTo(50f, tween(200))
+            offsetY.animateTo(-50f, tween(200))
+            offsetY.animateTo(0f, tween(200))
+        }
+    }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF00344F))
-            .padding(16.dp)
     ) {
         val screenHeightPx = constraints.maxHeight.toFloat()
         
@@ -64,7 +77,7 @@ fun CardScreen(viewModel: MainViewModel) {
                 color = Color.White
             )
             Text(
-                "连接中...",
+                "思考中...",
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center).offset(y = 40.dp)
             )
@@ -74,7 +87,7 @@ fun CardScreen(viewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
-                    .padding(top = 32.dp),
+                    .padding(top = 32.dp, start = 16.dp, end = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -98,68 +111,18 @@ fun CardScreen(viewModel: MainViewModel) {
                 )
             }
 
-            // Overlay Layers (Behind the Card)
-            val dragPercentage = if (screenHeightPx > 0) (abs(offsetY.value) / screenHeightPx) else 0f
-            val overlayAlpha = (dragPercentage / 0.25f * 0.8f).coerceIn(0f, 0.8f)
-            val isTriggerableDistance = dragPercentage >= 0.333f
-            val overlayColor = if (isTriggerableDistance) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
-
-            if (offsetY.value < 0) {
-                // Swipe Up - "完成"
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, overlayColor.copy(alpha = overlayAlpha)),
-                                startY = screenHeightPx * 0.5f,
-                                endY = screenHeightPx
-                            )
-                        )
-                ) {
-                    Text(
-                        text = "完成",
-                        color = Color.White.copy(alpha = overlayAlpha / 0.8f),
-                        fontSize = 24.sp,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
-                    )
-                }
-            } else if (offsetY.value > 0) {
-                // Swipe Down - "换一个"
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(overlayColor.copy(alpha = overlayAlpha), Color.Transparent),
-                                startY = 0f,
-                                endY = screenHeightPx * 0.5f
-                            )
-                        )
-                ) {
-                    Text(
-                        text = "换一个",
-                        color = Color.White.copy(alpha = overlayAlpha / 0.8f),
-                        fontSize = 24.sp,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
-                    )
-                }
-            }
-
-            // Draggable Card
             currentStep?.let { step ->
                 val velocityTracker = remember { VelocityTracker() }
 
+                val isTriggerable by remember(screenHeightPx) { 
+                    derivedStateOf { if (screenHeightPx > 0) (abs(offsetY.value) / screenHeightPx) >= 0.25f else false } 
+                }
+
+                val overlayColor = if (isTriggerable) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
+
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .fillMaxHeight(0.6f)
-                        .align(Alignment.Center)
-                        .offset { IntOffset(0, offsetY.value.roundToInt()) }
+                        .fillMaxSize()
                         .pointerInput(Unit) {
                             detectVerticalDragGestures(
                                 onDragStart = {
@@ -168,7 +131,7 @@ fun CardScreen(viewModel: MainViewModel) {
                                 onDragEnd = {
                                     coroutineScope.launch {
                                         val velocity = velocityTracker.calculateVelocity().y
-                                        val distanceMet = (abs(offsetY.value) / screenHeightPx) >= 0.333f
+                                        val distanceMet = (abs(offsetY.value) / screenHeightPx) >= 0.25f
                                         val velocityMet = abs(velocity) >= 300f
                                         
                                         if (distanceMet && velocityMet) {
@@ -177,10 +140,24 @@ fun CardScreen(viewModel: MainViewModel) {
                                                 offsetY.snapTo(0f)
                                             } else { // Swipe Down (Replace)
                                                 showReplaceDialog = true
-                                                offsetY.animateTo(0f, tween(300))
+                                                offsetY.animateTo(
+                                                    targetValue = 0f,
+                                                    animationSpec = spring(
+                                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                        stiffness = Spring.StiffnessMedium
+                                                    ),
+                                                    initialVelocity = velocity
+                                                )
                                             }
                                         } else {
-                                            offsetY.animateTo(0f, tween(300))
+                                            offsetY.animateTo(
+                                                targetValue = 0f,
+                                                animationSpec = spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessMedium
+                                                ),
+                                                initialVelocity = velocity
+                                            )
                                         }
                                     }
                                 }
@@ -192,20 +169,81 @@ fun CardScreen(viewModel: MainViewModel) {
                                 }
                             }
                         }
-                        .background(Color(0xFF006493), RoundedCornerShape(16.dp))
-                        .padding(24.dp)
                 ) {
-                    Text(
-                        text = step.content.cleanTaskText(),
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        lineHeight = 33.sp,
-                        style = TextStyle(
-                            textIndent = TextIndent(firstLine = 2.em)
-                        ),
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    // Overlay Layers (Behind the Card)
+                    // Swipe Up - "完成"
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                val dragPercentage = if (screenHeightPx > 0 && offsetY.value < 0) (abs(offsetY.value) / screenHeightPx) else 0f
+                                alpha = (dragPercentage / 0.25f * 0.8f).coerceIn(0f, 0.8f)
+                            }
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, overlayColor),
+                                    startY = screenHeightPx * 0.5f,
+                                    endY = screenHeightPx
+                                )
+                            )
+                    ) {
+                        Text(
+                            text = "完成",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
+                        )
+                    }
+
+                    // Swipe Down - "换一个"
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                val dragPercentage = if (screenHeightPx > 0 && offsetY.value > 0) (abs(offsetY.value) / screenHeightPx) else 0f
+                                alpha = (dragPercentage / 0.25f * 0.8f).coerceIn(0f, 0.8f)
+                            }
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(overlayColor, Color.Transparent),
+                                    startY = 0f,
+                                    endY = screenHeightPx * 0.5f
+                                )
+                            )
+                    ) {
+                        Text(
+                            text = "换一个",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(top = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
+                        )
+                    }
+
+                    // Draggable Card
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .fillMaxHeight(0.6f)
+                            .align(Alignment.Center)
+                            .offset { IntOffset(0, offsetY.value.roundToInt()) }
+                            .background(Color.Transparent, RoundedCornerShape(16.dp))
+                            .padding(24.dp)
+                    ) {
+                        Text(
+                            text = step.content.cleanTaskText(),
+                            color = Color.White,
+                            fontSize = 22.sp,
+                            lineHeight = 33.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .verticalScroll(rememberScrollState())
+                        )
+                    }
                 }
             }
         }
@@ -249,5 +287,10 @@ fun formatTimer(millis: Long): String {
 }
 
 private fun String.cleanTaskText(): String {
-    return this.replace(Regex("^[0-9]+[、.]\\s*"), "").replace(Regex("[。.]+$"), "")
+    return this
+        .replace(Regex("\\*\\*.*?\\*\\*"), "") // Remove bold markdown
+        .replace(Regex("^[0-9]+[、.]\\s*"), "") // Remove starting numbers
+        .replace(Regex("[。.]+$"), "") // Remove trailing periods
+        .replace("\n", "") // Remove newlines to make it a single paragraph
+        .trim()
 }

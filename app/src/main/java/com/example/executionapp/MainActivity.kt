@@ -17,9 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.executionapp.ui.CardScreen
 import com.example.executionapp.ui.InitialScreen
 import com.example.executionapp.ui.SummaryScreen
+import com.example.executionapp.ui.WelcomeDialog
 import com.example.executionapp.ui.theme.ExecutionAppTheme
 import com.example.executionapp.viewmodel.AppScreen
 import com.example.executionapp.viewmodel.ConnectionStatus
@@ -29,6 +31,10 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.connectionStatus.value == ConnectionStatus.CHECKING
+        }
         super.onCreate(savedInstanceState)
         setContent {
             ExecutionAppTheme {
@@ -40,9 +46,8 @@ class MainActivity : ComponentActivity() {
                     val currentScreen by viewModel.currentScreen.collectAsState()
 
                     if (connectionStatus == ConnectionStatus.CHECKING) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        // 移除这里的加载圈，直接复用闪屏页的等待机制
+                        
                     } else if (connectionStatus == ConnectionStatus.DISCONNECTED) {
                         val context = LocalContext.current
                         AlertDialog(
@@ -58,16 +63,26 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     } else {
-                        when (currentScreen) {
-                            AppScreen.INITIAL, AppScreen.VALIDATION -> {
-                                InitialScreen(viewModel)
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            when (currentScreen) {
+                                AppScreen.INITIAL, AppScreen.VALIDATION -> {
+                                    InitialScreen(viewModel)
+                                }
+                                AppScreen.CARDS -> {
+                                    CardScreen(viewModel)
+                                }
+                                AppScreen.SUMMARY -> {
+                                    SummaryScreen(viewModel)
+                                }
                             }
-                            AppScreen.CARDS -> {
-                                CardScreen(viewModel)
-                            }
-                            AppScreen.SUMMARY -> {
-                                SummaryScreen(viewModel)
-                            }
+
+                            val showWelcomeDialog by viewModel.showWelcomeDialog.collectAsState()
+                            WelcomeDialog(
+                                showDialog = showWelcomeDialog,
+                                onDismiss = { dontShowAgain ->
+                                    viewModel.dismissWelcomeDialog(dontShowAgain)
+                                }
+                            )
                         }
                     }
                 }

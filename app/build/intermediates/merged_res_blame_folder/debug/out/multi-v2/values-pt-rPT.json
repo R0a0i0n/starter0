@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.executionapp-mergeDebugResources-55:/values-pt-rPT/values-pt-rPT.xml",
+            "outputFile": "com.example.executionapp-mergeDebugResources-56:/values-pt-rPT/values-pt-rPT.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Eternity\\.gradle\\caches\\transforms-3\\702c080284dfca6e016916b56f2317d2\\transformed\\foundation-release\\res\\values-pt-rPT\\values-pt-rPT.xml",

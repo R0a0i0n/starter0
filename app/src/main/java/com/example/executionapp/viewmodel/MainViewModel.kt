@@ -15,9 +15,12 @@ import com.example.executionapp.network.Result
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -60,6 +63,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _summaryMessage = MutableStateFlow<String?>(null)
     val summaryMessage: StateFlow<String?> = _summaryMessage.asStateFlow()
+
+    private val _isWelcomeDialogDismissed = MutableStateFlow(false)
+    val showWelcomeDialog: StateFlow<Boolean> = combine(
+        preferencesManager.showWelcomeDialogFlow,
+        _isWelcomeDialogDismissed
+    ) { prefShow, dismissed ->
+        prefShow && !dismissed
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val hasSwipedCard: StateFlow<Boolean> = preferencesManager.hasSwipedCardFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     // Timer State
     private val _elapsedMillis = MutableStateFlow(0L)
@@ -203,6 +217,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun completeCurrentStep() {
         val step = _currentStep.value ?: return
         viewModelScope.launch {
+            _isLoading.value = true
+            preferencesManager.setHasSwipedCard()
             stopTimer()
             val duration = SystemClock.elapsedRealtime() - stepStartTime
             val completedStep = step.copy(
@@ -230,6 +246,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun skipCurrentStep(reason: String) {
         val step = _currentStep.value ?: return
         viewModelScope.launch {
+            _isLoading.value = true
+            preferencesManager.setHasSwipedCard()
+                , durationMillis = 0
             stopTimer()
             val skippedStep = step.copy(
                 status = StepStatus.SKIPPED,
@@ -249,8 +268,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         goalDao.updateGoal(goal.copy(isCompleted = true))
         
         // Remove generateSummary network request, use static message
-        _summaryMessage.value = "恭喜你完成了目标"
+        _summaryMessage.value = "恭喜你完成任务"
         _currentScreen.value = AppScreen.SUMMARY
+    }
+
+    fun dismissWelcomeDialog(dontShowAgain: Boolean) {
+        viewModelScope.launch {
+            if (dontShowAgain) {
+                preferencesManager.setDontShowWelcomeDialog()
+            }
+            _isWelcomeDialogDismissed.value = true
+        }
+    }
+
+    fun ignoreUnfinishedGoal() {
+        val goal = _currentGoal.value ?: return
+        viewModelScope.launch {
+            goalDao.updateGoal(goal.copy(isCompleted = true))
+            resetToInitial()
+        }
     }
 
     fun resetToInitial() {
@@ -279,10 +315,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         timerJob = null
     }
 
-    private fun formatDuration(millis: Long): String {
-        val seconds = (millis / 1000) % 60
-        val minutes = (millis / (1000 * 60)) % 60
-        val hours = (millis / (1000 * 60 * 60))
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    fun formatDuration(millis: Long): String {
+        if (millis <= 0) return "总用时 0秒"
+        
+        val totalSeconds = millis / 1000
+        val seconds = totalSeconds % 60
+        val minutes = (totalSeconds / 60) % 60
+        val hours = (totalSeconds / (60 * 60))
+        
+        val sb = StringBuilder()
+        if (hours > 0) sb.append("${hours}时")
+        if (minutes > 0) sb.append("${minutes}分")
+        if (seconds > 0 || sb.isEmpty()) sb.append("${seconds}秒")
+        
+        return "总用时 ${sb.toString()}"
     }
 }
