@@ -1,58 +1,40 @@
 package com.example.executionapp.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.executionapp.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun SummaryScreen(viewModel: MainViewModel) {
-    val summaryMessage by viewModel.summaryMessage.collectAsState()
-    val completedSteps by viewModel.completedSteps.collectAsState()
+    LaunchedEffect(Unit) {
+        delay(3000)
+        viewModel.resetToInitial()
+    }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .clickable { viewModel.resetToInitial() },
+        contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "目标达成！",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Text(
-            text = summaryMessage ?: "你太棒了！一步步滚到了终点！",
-            style = MaterialTheme.typography.bodyLarge,
+            text = "恭喜你完成了目标",
+            fontSize = 24.sp,
+            fontWeight = FontWeight(600),
+            color = Color(0xFF212121),
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        Text(
-            text = "共完成 ${completedSteps.size} 步",
-            style = MaterialTheme.typography.titleMedium
-        )
-        
-        Spacer(modifier = Modifier.height(48.dp))
-        
-        Button(
-            onClick = { viewModel.resetToInitial() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("开启新目标")
-        }
     }
 }

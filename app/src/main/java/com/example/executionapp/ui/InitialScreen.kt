@@ -5,10 +5,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.executionapp.viewmodel.AppScreen
 import com.example.executionapp.viewmodel.MainViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InitialScreen(viewModel: MainViewModel) {
     val currentScreen by viewModel.currentScreen.collectAsState()
@@ -39,23 +42,54 @@ fun InitialScreen(viewModel: MainViewModel) {
         )
     }
 
-    // Validation Alert
+    // Validation Alert (Bottom Sheet)
     if (currentScreen == AppScreen.VALIDATION && validationMessage != null) {
-        AlertDialog(
+        ModalBottomSheet(
             onDismissRequest = { viewModel.resetToInitial() },
-            title = { Text("目标建议") },
-            text = { Text(validationMessage!!) },
-            confirmButton = {
-                TextButton(onClick = { viewModel.resetToInitial() }) {
-                    Text("修改目标")
+            containerColor = MaterialTheme.colorScheme.surface,
+            scrimColor = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.5f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "再确认一下",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(
+                    text = "我们注意到你输入了“${goalText}”，你是不是想：\n\n${validationMessage}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
+                
+                Button(
+                    onClick = { viewModel.proceedToCreateGoal(goalText, currentActionText, resistanceText) },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                ) {
+                    Text("不做修改")
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.proceedToCreateGoal(goalText, currentActionText, resistanceText) }) {
-                    Text("强行继续")
+                
+                OutlinedButton(
+                    onClick = { viewModel.proceedToCreateGoal(validationMessage ?: goalText, currentActionText, resistanceText) },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                ) {
+                    Text("接受修改")
                 }
+                
+                TextButton(
+                    onClick = { viewModel.resetToInitial() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("我再想想")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
-        )
+        }
     }
 
     Column(

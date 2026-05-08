@@ -120,13 +120,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             when (validationResult) {
                 is Result.Success -> {
-                    val response = validationResult.data
-                    if (response.contains("合理")) {
-                        proceedToCreateGoal(goalName, currentAction, resistance)
-                    } else {
-                        _validationMessage.value = response
-                        _currentScreen.value = AppScreen.VALIDATION
-                    }
+                    _validationMessage.value = validationResult.data
+                    _currentScreen.value = AppScreen.VALIDATION
                 }
                 is Result.Error -> {
                     // Fallback to proceed if network error or just show error
@@ -171,6 +166,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         _isLoading.value = true
+        
+        val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
+
         val result = llmRepository.generateNextStep(
             goal = goal.name,
             currentAction = goal.currentAction,
@@ -179,7 +177,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             completedSteps = _completedSteps.value.map { it.content },
             isFinalStep = stepNum == 6,
             isReplace = isReplace,
-            replaceReason = replaceReason
+            replaceReason = replaceReason,
+            isTestGroup = isTestGroup
         )
         _isLoading.value = false
 
@@ -213,6 +212,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
             stepDao.updateStep(completedStep)
             
+            val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
+            android.util.Log.d("AB_TEST_LOG", "Task completed: step=${completedStep.stepNumber}, duration=${duration}ms, isTestGroup=$isTestGroup, action=accepted")
+
             val currentList = _completedSteps.value.toMutableList()
             currentList.add(completedStep)
             _completedSteps.value = currentList
@@ -234,6 +236,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 completedAt = System.currentTimeMillis()
             )
             stepDao.updateStep(skippedStep)
+            
+            val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
+            android.util.Log.d("AB_TEST_LOG", "Task skipped: step=${skippedStep.stepNumber}, reason=$reason, isTestGroup=$isTestGroup, action=rejected")
+            
             generateNextStep(isReplace = true, replaceReason = reason)
         }
     }
@@ -242,24 +248,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val goal = _currentGoal.value ?: return
         goalDao.updateGoal(goal.copy(isCompleted = true))
         
-        _isLoading.value = true
-        val steps = _completedSteps.value
-        val totalTime = steps.sumOf { it.durationMillis }
-        val timeStr = formatDuration(totalTime)
-        
-        val summaryResult = llmRepository.generateSummary(
-            goal.name,
-            steps.map { it.content },
-            timeStr
-        )
-        
-        if (summaryResult is Result.Success) {
-            _summaryMessage.value = summaryResult.data
-        } else {
-            _summaryMessage.value = "太棒了！你完成了所有的步骤！"
-        }
-        
-        _isLoading.value = false
+        // Remove generateSummary network request, use static message
+        _summaryMessage.value = "恭喜你完成了目标"
         _currentScreen.value = AppScreen.SUMMARY
     }
 

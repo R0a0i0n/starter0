@@ -22,7 +22,7 @@ class LlmRepository(private val apiService: LlmApiService) {
     }
 
     suspend fun validateGoal(goal: String, currentAction: String, resistance: String): Result<String> {
-        val systemPrompt = "你是一个目标合理性检验助手。判断用户的目标是否清晰、可完成、合理。如果不合理（例如'我要赚大钱'），指出问题并给出一个修改建议，以'建议修改为：xxx'的格式回复，并询问是否修改。如果目标合理，直接回复'合理'两个字。不要有其他废话。"
+        val systemPrompt = "你是一个目标合理性检验助手。请对用户的目标提出具体的修改意见，让它更清晰、更易于执行。哪怕目标已经不错，你也必须给出一个修改版。直接回复修改版的内容，不要有其他废话，不要以'建议修改为：'开头。"
         val userPrompt = "目标：$goal\n当前在做：$currentAction\n阻力：$resistance"
         return executeChat(systemPrompt, userPrompt)
     }
@@ -35,15 +35,22 @@ class LlmRepository(private val apiService: LlmApiService) {
         completedSteps: List<String>,
         isFinalStep: Boolean,
         isReplace: Boolean = false,
-        replaceReason: String? = null
+        replaceReason: String? = null,
+        isTestGroup: Boolean = false
     ): Result<String> {
         val systemPrompt = buildString {
-            append("你是“滚雪球执行力教练”。用户总目标是：$goal。")
-            if (preInput.isNotBlank()) append(" 用户的预输入偏好：$preInput。")
-            append("你一次只能给出【下一步】的小任务。任务描述不能超过 3 句话，且尽量能在三分钟内完成。")
-            append("请利用用户当前正在做的动作（$currentAction），让新旧动作无缝重叠。")
+            append("【场景】用户正在使用“滚雪球”执行力应用，试图克服阻力完成一个大目标。\n")
+            append("【角色】你是“滚雪球执行力教练”，负责将大目标拆解为极小、极易完成的动作。\n")
+            append("【任务】基于用户的大目标：$goal，以及当前正在做的动作：$currentAction。")
+            if (preInput.isNotBlank()) append(" 结合用户的预输入偏好：$preInput。")
+            append("让新旧动作无缝重叠，提供下一步的小任务。")
             if (isFinalStep) {
-                append("这是第6步，也是最后一步（最终目标）。请引导用户完成最终的目标动作。")
+                append("这是第6步，也是最后一步。请引导用户完成最终的目标动作。")
+            }
+            append("\n【格式】强制输出可执行的动作清单，绝对禁止任何抽象的建议或鼓励话语。")
+            
+            if (isTestGroup) {
+                append("请给出 1条可在 10 分钟内落地的具体动作，不说废话。")
             }
         }
         
@@ -65,6 +72,7 @@ class LlmRepository(private val apiService: LlmApiService) {
             }
         }
 
+        android.util.Log.d("AB_TEST_LOG", "generateNextStep: isTestGroup=$isTestGroup")
         return executeChat(systemPrompt, userPrompt)
     }
 

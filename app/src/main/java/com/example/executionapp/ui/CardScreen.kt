@@ -22,6 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.em
@@ -79,23 +84,75 @@ fun CardScreen(viewModel: MainViewModel) {
                     fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+                val currentProgressStep = (completedSteps.size + 1).coerceAtMost(6)
                 LinearProgressIndicator(
-                    progress = { completedSteps.size / 6f },
+                    progress = { currentProgressStep / 6f },
                     modifier = Modifier.fillMaxWidth(0.8f).height(8.dp),
                     color = Color(0xFF4CAF50),
                     trackColor = Color(0xFFB8C8DA)
                 )
                 Text(
-                    text = "${completedSteps.size}/6",
+                    text = "${currentProgressStep}/6",
                     color = Color.White,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
+            // Overlay Layers (Behind the Card)
+            val dragPercentage = if (screenHeightPx > 0) (abs(offsetY.value) / screenHeightPx) else 0f
+            val overlayAlpha = (dragPercentage / 0.25f * 0.8f).coerceIn(0f, 0.8f)
+            val isTriggerableDistance = dragPercentage >= 0.333f
+            val overlayColor = if (isTriggerableDistance) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
+
+            if (offsetY.value < 0) {
+                // Swipe Up - "完成"
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, overlayColor.copy(alpha = overlayAlpha)),
+                                startY = screenHeightPx * 0.5f,
+                                endY = screenHeightPx
+                            )
+                        )
+                ) {
+                    Text(
+                        text = "完成",
+                        color = Color.White.copy(alpha = overlayAlpha / 0.8f),
+                        fontSize = 24.sp,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
+                    )
+                }
+            } else if (offsetY.value > 0) {
+                // Swipe Down - "换一个"
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(overlayColor.copy(alpha = overlayAlpha), Color.Transparent),
+                                startY = 0f,
+                                endY = screenHeightPx * 0.5f
+                            )
+                        )
+                ) {
+                    Text(
+                        text = "换一个",
+                        color = Color.White.copy(alpha = overlayAlpha / 0.8f),
+                        fontSize = 24.sp,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
+                    )
+                }
+            }
+
             // Draggable Card
             currentStep?.let { step ->
-                val threshold = 400f
-                val dragProgress = (abs(offsetY.value) / threshold).coerceIn(0f, 1f)
+                val velocityTracker = remember { VelocityTracker() }
 
                 Box(
                     modifier = Modifier
@@ -104,15 +161,24 @@ fun CardScreen(viewModel: MainViewModel) {
                         .align(Alignment.Center)
                         .offset { IntOffset(0, offsetY.value.roundToInt()) }
                         .pointerInput(Unit) {
-                            detectDragGestures(
+                            detectVerticalDragGestures(
+                                onDragStart = {
+                                    velocityTracker.resetTracking()
+                                },
                                 onDragEnd = {
                                     coroutineScope.launch {
-                                        if (offsetY.value < -threshold) { // Swipe Up (Complete)
-                                            viewModel.completeCurrentStep()
-                                            offsetY.snapTo(0f)
-                                        } else if (offsetY.value > threshold) { // Swipe Down (Replace)
-                                            showReplaceDialog = true
-                                            offsetY.animateTo(0f, tween(300))
+                                        val velocity = velocityTracker.calculateVelocity().y
+                                        val distanceMet = (abs(offsetY.value) / screenHeightPx) >= 0.333f
+                                        val velocityMet = abs(velocity) >= 300f
+                                        
+                                        if (distanceMet && velocityMet) {
+                                            if (offsetY.value < 0) { // Swipe Up (Complete)
+                                                viewModel.completeCurrentStep()
+                                                offsetY.snapTo(0f)
+                                            } else { // Swipe Down (Replace)
+                                                showReplaceDialog = true
+                                                offsetY.animateTo(0f, tween(300))
+                                            }
                                         } else {
                                             offsetY.animateTo(0f, tween(300))
                                         }
@@ -120,33 +186,15 @@ fun CardScreen(viewModel: MainViewModel) {
                                 }
                             ) { change, dragAmount ->
                                 change.consume()
+                                velocityTracker.addPointerInputChange(change)
                                 coroutineScope.launch {
-                                    offsetY.snapTo(offsetY.value + dragAmount.y)
+                                    offsetY.snapTo(offsetY.value + dragAmount)
                                 }
                             }
                         }
                         .background(Color(0xFF006493), RoundedCornerShape(16.dp))
                         .padding(24.dp)
                 ) {
-                    // Swipe Background Hint
-                    if (offsetY.value < 0) {
-                        Box(modifier = Modifier.fillMaxSize().alpha(dragProgress).background(Color(0xFF4CAF50)))
-                        Text(
-                            "完 成",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp).alpha(dragProgress)
-                        )
-                    } else if (offsetY.value > 0) {
-                        Box(modifier = Modifier.fillMaxSize().alpha(dragProgress).background(Color(0xFF9E9E9E)))
-                        Text(
-                            "换 一 个",
-                            color = Color.White,
-                            fontSize = 24.sp,
-                            modifier = Modifier.align(Alignment.TopCenter).padding(16.dp).alpha(dragProgress)
-                        )
-                    }
-
                     Text(
                         text = step.content.cleanTaskText(),
                         color = Color.White,
