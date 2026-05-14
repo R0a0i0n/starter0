@@ -3,6 +3,11 @@ package com.example.executionapp.network
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+data class GeneratedPlan(
+    val steps: List<String>,
+    val rawContent: String
+)
+
 class LlmRepository(private val apiService: LlmApiService) {
 
     private val authHeader = "Bearer ${ApiClient.API_KEY}"
@@ -22,77 +27,110 @@ class LlmRepository(private val apiService: LlmApiService) {
     }
 
     suspend fun validateGoal(goal: String, currentAction: String, resistance: String): Result<String> {
-        val systemPrompt = "你是一个目标合理性检验助手。请对用户的目标提出具体的修改意见，让它更清晰、更易于执行。注意：在优化目标时，绝对不能涉及任何与现实具体时间（如几点去做什么）相关的内容。哪怕目标已经不错，你也必须给出一个修改版。直接回复修改版的内容，不要有其他废话，不要以'建议修改为：'开头。"
+        val systemPrompt = "你是一个目标优化助手。请对用户的目标提出具体优化，让它更清晰、更易于执行。注意：优化后的目标绝对不能包含任何现实时间安排，例如几点、今天晚上、明天早上。哪怕目标已经不错，你也必须给出一个修改版。直接回复优化后的目标，不要有其他废话。"
         val userPrompt = "目标：$goal\n当前在做：$currentAction\n阻力：$resistance"
         return executeChat(systemPrompt, userPrompt)
     }
 
-    suspend fun generateNextStep(
+    suspend fun generateExecutionPlan(
         goal: String,
         currentAction: String,
         resistance: String,
         preInput: String,
         completedSteps: List<String>,
-        isFinalStep: Boolean,
-        isReplace: Boolean = false,
-        replaceReason: String? = null,
-        isTestGroup: Boolean = false
-    ): Result<String> {
+        regenerateFromStep: Int,
+        replaceReason: String? = null
+    ): Result<GeneratedPlan> {
         val systemPrompt = buildString {
-            append("【场景】用户正在使用“滚雪球”执行力应用，试图克服阻力完成一个大目标。\n")
-            append("【角色】你是“滚雪球执行力教练”，负责将大目标拆解为极小、极易完成的动作。\n")
-            append("【任务】基于用户的大目标：$goal，以及当前正在做的动作：$currentAction。")
-            if (preInput.isNotBlank()) append(" 结合用户的预输入偏好：$preInput。")
-            append("提供下一步的小任务。\n")
-            append("【核心规则】\n")
-            append("1. 每个小目标要有区别，体现循序渐进一步一步达成。\n")
-            append("2. 每一步和上一步必须有新内容，绝不能重复。\n")
-            append("3. 一定要把用户输入的大目标设定为六步做完之后才能达成的，绝不能一开始就让用户直接完成大目标。\n")
-            if (isFinalStep) {
-                append("这是第6步，也是最后一步。请引导用户完成最终的目标动作。\n")
-            } else {
-                append("当前不是最后一步，仅提供当前的过渡性小任务。\n")
-            }
-            append("【格式】绝对禁止任何前置铺垫（如'基于您的反馈'）、背景说明或鼓励话语。不要分条列点（不要出现1. 2. 3.）。请将内容压缩在50字以内，输出一段简洁无冗余的指令文本，只包含具体要做什么。")
-            
-            if (isTestGroup) {
-                append("（测试组追加要求：确保该动作可在10分钟内落地，绝对不含废话）")
-            }
+            append("【角色】你是“滚雪球执行力教练”，负责先生成一份正式的六步总体步骤规划，再按规划执行。\n")
+            append("【核心要求】\n")
+            append("1. 必须输出完整六步规划，且只输出六行。\n")
+            append("2. 第6步必须是用户最终目标本身，不得提前到前5步，也不得改写其核心动作。\n")
+            append("3. 第1步到第5步必须循序渐进、彼此不同、每一步都有新的推进内容，绝不能重复。\n")
+            append("4. 不得出现任何现实时间安排，例如几点、今晚、明早、下班后。\n")
+            append("5. 如果提供了已完成步骤，这些步骤必须原样保留，不得改写。\n")
+            append("6. 如果这是“换一个”后的重规划，只能重写指定步骤及其后的剩余步骤。\n")
+            append("7. 输出格式固定为六行：第1步：... 到 第6步：...\n")
+            append("8. 每一步都只写具体动作，不要解释、不要鼓励、不要加标题。")
         }
-        
+
         val userPrompt = buildString {
+            append("最终目标：$goal\n")
+            append("当前动作：$currentAction\n")
+            append("阻力：$resistance\n")
+            append("必须保证第6步严格指向这个最终目标。\n")
+            append("需要从第${regenerateFromStep}步开始作为当前待执行步骤。\n")
+            if (preInput.isNotBlank()) {
+                append("用户预输入偏好：$preInput\n")
+            }
             if (completedSteps.isNotEmpty()) {
-                append("已完成步骤：\n")
+                append("已完成步骤（必须原样保留）：\n")
                 completedSteps.forEachIndexed { index, step ->
-                    append("${index + 1}. $step\n")
+                    append("第${index + 1}步：$step\n")
                 }
             }
-            if (isReplace) {
-                append("用户对上一个步骤选择了“换一个”。")
-                if (!replaceReason.isNullOrBlank()) {
-                    append(" 困难是：$replaceReason。")
-                }
-                append("请重新生成当前步骤。")
+            if (!replaceReason.isNullOrBlank()) {
+                append("触发“换一个”的原因：$replaceReason\n")
+                append("请从当前步骤开始重写后续规划。\n")
             } else {
-                append("请给出下一步的小任务。")
+                append("请生成初始总体步骤规划。\n")
             }
         }
 
-        android.util.Log.d("AB_TEST_LOG", "generateNextStep: isTestGroup=$isTestGroup")
-        return executeChat(systemPrompt, userPrompt)
+        return when (val result = executeChat(systemPrompt, userPrompt)) {
+            is Result.Success -> {
+                val parsedSteps = parsePlanSteps(result.data)
+                if (parsedSteps == null) {
+                    Result.Error(IllegalStateException("规划解析失败"))
+                } else {
+                    val normalizedSteps = parsedSteps.toMutableList()
+                    completedSteps.forEachIndexed { index, step ->
+                        if (index < normalizedSteps.size) {
+                            normalizedSteps[index] = step.trim()
+                        }
+                    }
+                    normalizedSteps[5] = goal.trim()
+                    if (normalizedSteps.any { it.isBlank() }) {
+                        Result.Error(IllegalStateException("规划包含空步骤"))
+                    } else {
+                        Result.Success(
+                            GeneratedPlan(
+                                steps = normalizedSteps,
+                                rawContent = result.data
+                            )
+                        )
+                    }
+                }
+            }
+
+            is Result.Error -> Result.Error(result.exception)
+        }
     }
 
-    suspend fun generateSummary(goal: String, completedSteps: List<String>, totalTimeStr: String): Result<String> {
-        val systemPrompt = "你是“滚雪球执行力教练”。用户刚刚完成了一个目标，请给出简短的总结回顾和鼓励。"
-        val userPrompt = "目标：$goal\n总耗时：$totalTimeStr\n完成步骤：\n${completedSteps.joinToString("\n")}\n请生成鼓励总结（如'你太棒了！从...到...，你一步步滚到了终点！'）"
-        return executeChat(systemPrompt, userPrompt)
+    private fun parsePlanSteps(content: String): List<String>? {
+        val matches = Regex("""第([1-6])步[：:]\s*(.+)""")
+            .findAll(content)
+            .mapNotNull { match ->
+                val stepNumber = match.groupValues[1].toIntOrNull() ?: return@mapNotNull null
+                stepNumber to match.groupValues[2].trim()
+            }
+            .toList()
+
+        if (matches.size != 6) return null
+
+        val orderedSteps = MutableList(6) { "" }
+        matches.forEach { (stepNumber, text) ->
+            orderedSteps[stepNumber - 1] = text
+        }
+
+        return if (orderedSteps.all { it.isNotBlank() }) orderedSteps else null
     }
 
     private suspend fun executeChat(systemPrompt: String, userPrompt: String): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
                 android.util.Log.d("LlmDialogue", "====== API Request ======\nSystem: $systemPrompt\nUser: $userPrompt")
-                
+
                 val request = ChatRequest(
                     messages = listOf(
                         ChatMessage("system", systemPrompt),

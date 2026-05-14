@@ -6,10 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.executionapp.data.AppDatabase
 import com.example.executionapp.data.Goal
+import com.example.executionapp.data.PlanFileManager
 import com.example.executionapp.data.PreferencesManager
 import com.example.executionapp.data.Step
 import com.example.executionapp.data.StepStatus
 import com.example.executionapp.network.ApiClient
+import com.example.executionapp.network.GeneratedPlan
 import com.example.executionapp.network.LlmRepository
 import com.example.executionapp.network.Result
 import kotlinx.coroutines.Job
@@ -38,6 +40,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val goalDao = db.goalDao()
     private val stepDao = db.stepDao()
     private val preferencesManager = PreferencesManager(application)
+    private val planFileManager = PlanFileManager(application)
     private val llmRepository = LlmRepository(ApiClient.llmApiService)
 
     private val _connectionStatus = MutableStateFlow(ConnectionStatus.CHECKING)
@@ -63,6 +66,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _summaryMessage = MutableStateFlow<String?>(null)
     val summaryMessage: StateFlow<String?> = _summaryMessage.asStateFlow()
+
+    private val _planDocumentContent = MutableStateFlow<String?>(null)
+    val planDocumentContent: StateFlow<String?> = _planDocumentContent.asStateFlow()
 
     private val _isWelcomeDialogDismissed = MutableStateFlow(false)
     val showWelcomeDialog: StateFlow<Boolean> = combine(
@@ -114,13 +120,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _currentGoal.value = goal
             val steps = stepDao.getStepsForGoal(goal.id).first()
             _completedSteps.value = steps.filter { it.status == StepStatus.COMPLETED }
+            _planDocumentContent.value = planFileManager.loadPlan(goal.id)?.content
             val lastStep = steps.lastOrNull()
             if (lastStep?.status == StepStatus.CURRENT) {
                 _currentStep.value = lastStep
                 startTimer()
                 _currentScreen.value = AppScreen.CARDS
             } else {
-                generateNextStep()
+                generatePlanAndLoadCurrentStep()
                 _currentScreen.value = AppScreen.CARDS
             }
         }
@@ -161,57 +168,125 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _currentGoal.value = newGoal.copy(id = goalId)
             
             _completedSteps.value = emptyList()
-            generateNextStep()
+            generatePlanAndLoadCurrentStep()
             _currentScreen.value = AppScreen.CARDS
         }
     }
 
-    private suspend fun generateNextStep(isReplace: Boolean = false, replaceReason: String? = null) {
+    private suspend fun generatePlanAndLoadCurrentStep(
+        isReplace: Boolean = false,
+        replaceReason: String? = null
+    ) {
         val goal = _currentGoal.value ?: return
-        val stepNum = if (isReplace) {
+        val currentStepNumber = if (isReplace) {
             _currentStep.value?.stepNumber ?: 1
         } else {
             (_completedSteps.value.size) + 1
         }
 
-        if (stepNum > 6) {
+        if (currentStepNumber > 6) {
             finishGoal()
             return
         }
 
         _isLoading.value = true
-        
-        val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
 
-        val result = llmRepository.generateNextStep(
-            goal = goal.name,
-            currentAction = goal.currentAction,
-            resistance = goal.resistance,
-            preInput = goal.preInput,
-            completedSteps = _completedSteps.value.map { it.content },
-            isFinalStep = stepNum == 6,
-            isReplace = isReplace,
-            replaceReason = replaceReason,
-            isTestGroup = isTestGroup
-        )
-        _isLoading.value = false
+        val shouldRegeneratePlan = isReplace && currentStepNumber < 5
+        val existingPlan = planFileManager.loadPlan(goal.id)
 
-        when (result) {
+        val planResult = when {
+            existingPlan == null -> {
+                llmRepository.generateExecutionPlan(
+                    goal = goal.name,
+                    currentAction = goal.currentAction,
+                    resistance = goal.resistance,
+                    preInput = goal.preInput,
+                    completedSteps = _completedSteps.value.map { it.content },
+                    regenerateFromStep = currentStepNumber,
+                    replaceReason = null
+                )
+            }
+
+            shouldRegeneratePlan -> {
+                llmRepository.generateExecutionPlan(
+                    goal = goal.name,
+                    currentAction = goal.currentAction,
+                    resistance = goal.resistance,
+                    preInput = goal.preInput,
+                    completedSteps = _completedSteps.value.map { it.content },
+                    regenerateFromStep = currentStepNumber,
+                    replaceReason = replaceReason
+                )
+            }
+
+            else -> {
+                Result.Success(
+                    GeneratedPlan(
+                        steps = existingPlan.steps,
+                        rawContent = existingPlan.content
+                    )
+                )
+            }
+        }
+
+        when (planResult) {
             is Result.Success -> {
+                val planDocument = planFileManager.savePlan(
+                    goalId = goal.id,
+                    goalName = goal.name,
+                    steps = planResult.data.steps
+                )
+                _planDocumentContent.value = planDocument.content
+
+                val stepContent = planDocument.steps.getOrNull(currentStepNumber - 1)
+                if (stepContent.isNullOrBlank()) {
+                    _isLoading.value = false
+                    return
+                }
+
                 val newStep = Step(
                     goalId = goal.id,
-                    stepNumber = stepNum,
-                    content = result.data,
+                    stepNumber = currentStepNumber,
+                    content = stepContent,
                     status = StepStatus.CURRENT
                 )
                 val stepId = stepDao.insertStep(newStep)
                 _currentStep.value = newStep.copy(id = stepId)
+                _isLoading.value = false
                 startTimer()
             }
+
             is Result.Error -> {
-                // TODO: handle error (offline queue)
+                _isLoading.value = false
             }
         }
+    }
+
+    private suspend fun loadStepFromPlan(stepNumber: Int) {
+        val goal = _currentGoal.value ?: return
+        if (stepNumber > 6) {
+            finishGoal()
+            return
+        }
+
+        val planDocument = planFileManager.loadPlan(goal.id)
+        _planDocumentContent.value = planDocument?.content
+        val stepContent = when (stepNumber) {
+            6 -> goal.name
+            else -> planDocument?.steps?.getOrNull(stepNumber - 1)
+        } ?: return
+
+        _isLoading.value = true
+        val newStep = Step(
+            goalId = goal.id,
+            stepNumber = stepNumber,
+            content = stepContent,
+            status = StepStatus.CURRENT
+        )
+        val stepId = stepDao.insertStep(newStep)
+        _currentStep.value = newStep.copy(id = stepId)
+        _isLoading.value = false
+        startTimer()
     }
 
     fun completeCurrentStep() {
@@ -228,9 +303,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
             stepDao.updateStep(completedStep)
             
-            val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
-            android.util.Log.d("AB_TEST_LOG", "Task completed: step=${completedStep.stepNumber}, duration=${duration}ms, isTestGroup=$isTestGroup, action=accepted")
-
             val currentList = _completedSteps.value.toMutableList()
             currentList.add(completedStep)
             _completedSteps.value = currentList
@@ -238,7 +310,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (completedStep.stepNumber == 6) {
                 finishGoal()
             } else {
-                generateNextStep()
+                loadStepFromPlan(completedStep.stepNumber + 1)
             }
         }
     }
@@ -248,18 +320,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             preferencesManager.setHasSwipedCard()
-                , durationMillis = 0
             stopTimer()
             val skippedStep = step.copy(
                 status = StepStatus.SKIPPED,
-                completedAt = System.currentTimeMillis()
+                completedAt = System.currentTimeMillis(),
+                durationMillis = 0L
             )
             stepDao.updateStep(skippedStep)
             
-            val isTestGroup = preferencesManager.getOrInitializeAbTestGroup()
-            android.util.Log.d("AB_TEST_LOG", "Task skipped: step=${skippedStep.stepNumber}, reason=$reason, isTestGroup=$isTestGroup, action=rejected")
-            
-            generateNextStep(isReplace = true, replaceReason = reason)
+            if (skippedStep.stepNumber >= 5) {
+                loadStepFromPlan(6)
+            } else {
+                generatePlanAndLoadCurrentStep(isReplace = true, replaceReason = reason)
+            }
         }
     }
 
@@ -270,6 +343,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // Remove generateSummary network request, use static message
         _summaryMessage.value = "恭喜你完成任务"
         _currentScreen.value = AppScreen.SUMMARY
+        _isLoading.value = false
     }
 
     fun dismissWelcomeDialog(dontShowAgain: Boolean) {
@@ -295,6 +369,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _currentStep.value = null
         _completedSteps.value = emptyList()
         _summaryMessage.value = null
+        _planDocumentContent.value = null
+        _isLoading.value = false
         stopTimer()
     }
 

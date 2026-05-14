@@ -1,8 +1,8 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.example.executionapp"
-4    android:versionCode="2"
-5    android:versionName="0.1.2" >
+4    android:versionCode="4"
+5    android:versionName="0.1.6" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="26"
@@ -51,117 +51,116 @@
 31-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:16:9-59
 32        android:supportsRtl="true"
 32-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:17:9-35
-33        android:testOnly="true"
-34        android:theme="@style/Theme.App.Starting" >
-34-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:18:9-50
-35        <activity
-35-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:20:9-29:20
-36            android:name="com.example.executionapp.MainActivity"
-36-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:21:13-41
-37            android:exported="true"
-37-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:22:13-36
-38            android:screenOrientation="portrait"
-38-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:23:13-49
-39            android:theme="@style/Theme.App.Starting" >
-39-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:24:13-54
-40            <intent-filter>
-40-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:25:13-28:29
-41                <action android:name="android.intent.action.MAIN" />
-41-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:26:17-69
-41-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:26:25-66
-42
-43                <category android:name="android.intent.category.LAUNCHER" />
-43-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:27:17-77
-43-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:27:27-74
-44            </intent-filter>
-45        </activity>
-46        <activity
-46-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:23:9-25:39
-47            android:name="androidx.activity.ComponentActivity"
-47-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:24:13-63
-48            android:exported="true" />
-48-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:25:13-36
-49        <activity
-49-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-50            android:name="androidx.compose.ui.tooling.PreviewActivity"
-50-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-51            android:exported="true" />
-51-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-52
-53        <provider
-53-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-54            android:name="androidx.startup.InitializationProvider"
-54-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-55            android:authorities="com.example.executionapp.androidx-startup"
-55-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-56            android:exported="false" >
-56-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-57            <meta-data
-57-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-58                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-58-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-59                android:value="androidx.startup" />
-59-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-60            <meta-data
-60-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
-61                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-61-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
-62                android:value="androidx.startup" />
-62-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
-63            <meta-data
-63-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-64                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-64-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-65                android:value="androidx.startup" />
-65-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-66        </provider>
-67
-68        <service
-68-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
-69            android:name="androidx.room.MultiInstanceInvalidationService"
-69-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
-70            android:directBootAware="true"
-70-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
-71            android:exported="false" />
-71-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
-72
-73        <receiver
-73-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-74            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-75            android:directBootAware="false"
-75-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-76            android:enabled="true"
-76-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-77            android:exported="true"
-77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-78            android:permission="android.permission.DUMP" >
-78-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-79            <intent-filter>
-79-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-80                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-80-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-80-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-81            </intent-filter>
-82            <intent-filter>
-82-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-83                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-83-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-83-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-84            </intent-filter>
-85            <intent-filter>
-85-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-86                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-86-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-87            </intent-filter>
-88            <intent-filter>
-88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-89                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-89-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-90            </intent-filter>
-91        </receiver>
-92    </application>
-93
-94</manifest>
+33        android:theme="@style/Theme.App.Starting" >
+33-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:18:9-50
+34        <activity
+34-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:20:9-29:20
+35            android:name="com.example.executionapp.MainActivity"
+35-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:21:13-41
+36            android:exported="true"
+36-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:22:13-36
+37            android:screenOrientation="portrait"
+37-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:23:13-49
+38            android:theme="@style/Theme.App.Starting" >
+38-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:24:13-54
+39            <intent-filter>
+39-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:25:13-28:29
+40                <action android:name="android.intent.action.MAIN" />
+40-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:26:17-69
+40-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:26:25-66
+41
+42                <category android:name="android.intent.category.LAUNCHER" />
+42-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:27:17-77
+42-->S:\rolling_start\starter\app\src\main\AndroidManifest.xml:27:27-74
+43            </intent-filter>
+44        </activity>
+45        <activity
+45-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:23:9-25:39
+46            android:name="androidx.activity.ComponentActivity"
+46-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:24:13-63
+47            android:exported="true" />
+47-->[androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\0422ca281cb24d62a98ae3186f3b7252\transformed\ui-test-manifest-1.6.1\AndroidManifest.xml:25:13-36
+48        <activity
+48-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+49            android:name="androidx.compose.ui.tooling.PreviewActivity"
+49-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+50            android:exported="true" />
+50-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\ddcaa30b073b6994f6d43856786fddac\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+51
+52        <provider
+52-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+53            android:name="androidx.startup.InitializationProvider"
+53-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+54            android:authorities="com.example.executionapp.androidx-startup"
+54-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+55            android:exported="false" >
+55-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+56            <meta-data
+56-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+57                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+57-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+58                android:value="androidx.startup" />
+58-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\1e963e9e6789d0079ca23bf1fcbbddee\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+59            <meta-data
+59-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+60                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+60-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+61                android:value="androidx.startup" />
+61-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Eternity\.gradle\caches\transforms-3\d80fb3a2cf3d9c4d910519d9cdf1ca9a\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+62            <meta-data
+62-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+63                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+63-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+64                android:value="androidx.startup" />
+64-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+65        </provider>
+66
+67        <service
+67-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+68            android:name="androidx.room.MultiInstanceInvalidationService"
+68-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+69            android:directBootAware="true"
+69-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+70            android:exported="false" />
+70-->[androidx.room:room-runtime:2.6.1] C:\Users\Eternity\.gradle\caches\transforms-3\d2d48dd98adeb3d0d18d109726a74a22\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+71
+72        <receiver
+72-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+73            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+73-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+74            android:directBootAware="false"
+74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+75            android:enabled="true"
+75-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+76            android:exported="true"
+76-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+77            android:permission="android.permission.DUMP" >
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+78            <intent-filter>
+78-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+79                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+79-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+79-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+80            </intent-filter>
+81            <intent-filter>
+81-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+82                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+82-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+82-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+83            </intent-filter>
+84            <intent-filter>
+84-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+85                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+85-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+85-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+86            </intent-filter>
+87            <intent-filter>
+87-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+88                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Eternity\.gradle\caches\transforms-3\6924fa5f5351d6479e5932da807bf5c6\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+89            </intent-filter>
+90        </receiver>
+91    </application>
+92
+93</manifest>

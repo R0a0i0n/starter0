@@ -283,7 +283,7 @@ fun InitialScreen(viewModel: MainViewModel) {
         }
 
         Text(
-            text = "0.1.4"  ,
+            text = "0.1.6"  ,
             color = Color.LightGray.copy(alpha = 0.85f),
             fontSize = 12.sp,
             modifier = Modifier
