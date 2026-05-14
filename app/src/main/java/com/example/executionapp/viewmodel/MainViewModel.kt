@@ -191,7 +191,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         _isLoading.value = true
 
-        val shouldRegeneratePlan = isReplace && currentStepNumber < 5
+        val shouldRegeneratePlan = isReplace && currentStepNumber < 6
         val existingPlan = planFileManager.loadPlan(goal.id)
 
         val planResult = when {
@@ -271,10 +271,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val planDocument = planFileManager.loadPlan(goal.id)
         _planDocumentContent.value = planDocument?.content
-        val stepContent = when (stepNumber) {
-            6 -> goal.name
-            else -> planDocument?.steps?.getOrNull(stepNumber - 1)
-        } ?: return
+        val stepContent = planDocument?.steps?.getOrNull(stepNumber - 1) ?: return
 
         _isLoading.value = true
         val newStep = Step(
@@ -328,7 +325,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
             stepDao.updateStep(skippedStep)
             
-            if (skippedStep.stepNumber >= 5) {
+            if (skippedStep.stepNumber == 6) {
                 loadStepFromPlan(6)
             } else {
                 generatePlanAndLoadCurrentStep(isReplace = true, replaceReason = reason)
@@ -339,11 +336,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun finishGoal() {
         val goal = _currentGoal.value ?: return
         goalDao.updateGoal(goal.copy(isCompleted = true))
-        
-        // Remove generateSummary network request, use static message
-        _summaryMessage.value = "恭喜你完成任务"
+
+        _summaryMessage.value = buildSummaryMessage(goal.name)
         _currentScreen.value = AppScreen.SUMMARY
         _isLoading.value = false
+    }
+
+    private fun buildSummaryMessage(goalName: String): String {
+        val normalizedGoal = goalName.trim().trimEnd('。', '！', '!', '?', '？')
+        return "恭喜你，现在你可以静下心去实现你的目标“$normalizedGoal”了"
     }
 
     fun dismissWelcomeDialog(dontShowAgain: Boolean) {

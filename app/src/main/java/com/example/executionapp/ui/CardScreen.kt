@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -20,9 +21,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.rememberScrollState
@@ -31,7 +40,7 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.executionapp.viewmodel.MainViewModel
@@ -42,10 +51,12 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CardScreen(viewModel: MainViewModel) {
+    val context = LocalContext.current
     val currentStep by viewModel.currentStep.collectAsState()
     val completedSteps by viewModel.completedSteps.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val elapsedMillis by viewModel.elapsedMillis.collectAsState()
+    val isFinalStep = currentStep?.stepNumber == 6
 
     val hasSwipedCard by viewModel.hasSwipedCard.collectAsState()
 
@@ -54,6 +65,21 @@ fun CardScreen(viewModel: MainViewModel) {
 
     val offsetY = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
+    val cardBackgroundResId = remember(context) {
+        context.resources.getIdentifier("card_background", "drawable", context.packageName)
+    }
+    val subtleTextShadow = Shadow(
+        color = Color.Black.copy(alpha = 0.22f),
+        offset = Offset(0f, 3f),
+        blurRadius = 8f
+    )
+    val roundedTimerTextStyle = TextStyle(
+        color = Color.White,
+        fontSize = 34.sp,
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.SemiBold,
+        shadow = subtleTextShadow
+    )
 
     LaunchedEffect(hasSwipedCard, currentStep) {
         if (!hasSwipedCard && currentStep != null) {
@@ -67,10 +93,38 @@ fun CardScreen(viewModel: MainViewModel) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF00344F))
     ) {
         val screenHeightPx = constraints.maxHeight.toFloat()
-        
+
+        if (cardBackgroundResId != 0) {
+            Image(
+                painter = painterResource(id = cardBackgroundResId),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF17435C),
+                                Color(0xFF0E2A3D),
+                                Color(0xFF081B29)
+                            )
+                        )
+                    )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF081B29).copy(alpha = 0.38f))
+        )
+
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -92,22 +146,29 @@ fun CardScreen(viewModel: MainViewModel) {
             ) {
                 Text(
                     text = formatTimer(elapsedMillis),
-                    color = Color.White,
-                    fontSize = 32.sp,
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    style = roundedTimerTextStyle
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 val currentProgressStep = (completedSteps.size + 1).coerceAtMost(6)
                 LinearProgressIndicator(
                     progress = { currentProgressStep / 6f },
-                    modifier = Modifier.fillMaxWidth(0.8f).height(8.dp),
-                    color = Color(0xFF4CAF50),
-                    trackColor = Color(0xFFB8C8DA)
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(999.dp)),
+                    color = Color(0xFFB0F9B7),
+                    trackColor = Color.White.copy(alpha = 0.28f)
                 )
                 Text(
                     text = "${currentProgressStep}/6",
                     color = Color.White,
-                    modifier = Modifier.padding(top = 4.dp)
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        shadow = subtleTextShadow
+                    ),
+                    modifier = Modifier.padding(top = 6.dp)
                 )
             }
 
@@ -138,7 +199,7 @@ fun CardScreen(viewModel: MainViewModel) {
                                             if (offsetY.value < 0) { // Swipe Up (Complete)
                                                 viewModel.completeCurrentStep()
                                                 offsetY.snapTo(0f)
-                                            } else { // Swipe Down (Replace)
+                                            } else if (!isFinalStep) { // Swipe Down (Replace)
                                                 showReplaceDialog = true
                                                 offsetY.animateTo(
                                                     targetValue = 0f,
@@ -191,6 +252,12 @@ fun CardScreen(viewModel: MainViewModel) {
                             text = "完成",
                             color = Color.White,
                             fontSize = 24.sp,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Medium,
+                                shadow = subtleTextShadow
+                            ),
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(bottom = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
@@ -202,21 +269,34 @@ fun CardScreen(viewModel: MainViewModel) {
                         modifier = Modifier
                             .fillMaxSize()
                             .graphicsLayer {
-                                val dragPercentage = if (screenHeightPx > 0 && offsetY.value > 0) (abs(offsetY.value) / screenHeightPx) else 0f
+                                val dragPercentage = if (!isFinalStep && screenHeightPx > 0 && offsetY.value > 0) {
+                                    (abs(offsetY.value) / screenHeightPx)
+                                } else {
+                                    0f
+                                }
                                 alpha = (dragPercentage / 0.25f * 0.8f).coerceIn(0f, 0.8f)
                             }
                             .background(
                                 Brush.verticalGradient(
-                                    colors = listOf(overlayColor, Color.Transparent),
+                                    colors = listOf(
+                                        if (isFinalStep) Color.Transparent else overlayColor,
+                                        Color.Transparent
+                                    ),
                                     startY = 0f,
                                     endY = screenHeightPx * 0.5f
                                 )
                             )
                     ) {
                         Text(
-                            text = "换一个",
+                            text = if (isFinalStep) "" else "换一个",
                             color = Color.White,
                             fontSize = 24.sp,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Medium,
+                                shadow = subtleTextShadow
+                            ),
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
                                 .padding(top = with(LocalDensity.current) { (screenHeightPx * 0.08f).toDp() })
@@ -239,6 +319,14 @@ fun CardScreen(viewModel: MainViewModel) {
                             fontSize = 22.sp,
                             lineHeight = 33.sp,
                             textAlign = TextAlign.Center,
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 22.sp,
+                                lineHeight = 33.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium,
+                                shadow = subtleTextShadow
+                            ),
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .verticalScroll(rememberScrollState())

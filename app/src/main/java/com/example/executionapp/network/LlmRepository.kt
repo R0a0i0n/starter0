@@ -45,8 +45,8 @@ class LlmRepository(private val apiService: LlmApiService) {
             append("【角色】你是“滚雪球执行力教练”，负责先生成一份正式的六步总体步骤规划，再按规划执行。\n")
             append("【核心要求】\n")
             append("1. 必须输出完整六步规划，且只输出六行。\n")
-            append("2. 第6步必须是用户最终目标本身，不得提前到前5步，也不得改写其核心动作。\n")
-            append("3. 第1步到第5步必须循序渐进、彼此不同、每一步都有新的推进内容，绝不能重复。\n")
+            append("2. 六个步骤都必须是系统生成的具体小任务，第6步也必须与前5步保持一致，不能直接照抄用户输入的目标。\n")
+            append("3. 第1步到第6步必须循序渐进、彼此不同、每一步都有新的推进内容，绝不能重复。\n")
             append("4. 不得出现任何现实时间安排，例如几点、今晚、明早、下班后。\n")
             append("5. 如果提供了已完成步骤，这些步骤必须原样保留，不得改写。\n")
             append("6. 如果这是“换一个”后的重规划，只能重写指定步骤及其后的剩余步骤。\n")
@@ -58,7 +58,7 @@ class LlmRepository(private val apiService: LlmApiService) {
             append("最终目标：$goal\n")
             append("当前动作：$currentAction\n")
             append("阻力：$resistance\n")
-            append("必须保证第6步严格指向这个最终目标。\n")
+            append("这六步都要服务于这个最终目标，但第6步也必须是系统生成的小任务，不要直接复述目标原文。\n")
             append("需要从第${regenerateFromStep}步开始作为当前待执行步骤。\n")
             if (preInput.isNotBlank()) {
                 append("用户预输入偏好：$preInput\n")
@@ -89,7 +89,6 @@ class LlmRepository(private val apiService: LlmApiService) {
                             normalizedSteps[index] = step.trim()
                         }
                     }
-                    normalizedSteps[5] = goal.trim()
                     if (normalizedSteps.any { it.isBlank() }) {
                         Result.Error(IllegalStateException("规划包含空步骤"))
                     } else {

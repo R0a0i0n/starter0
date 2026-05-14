@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SummaryScreen(viewModel: MainViewModel) {
     val completedSteps by viewModel.completedSteps.collectAsState()
+    val summaryMessage by viewModel.summaryMessage.collectAsState()
     val totalTimeMillis = completedSteps.sumOf { it.durationMillis }
     val totalTimeStr = viewModel.formatDuration(totalTimeMillis)
 
@@ -45,6 +46,9 @@ fun SummaryScreen(viewModel: MainViewModel) {
         FireworksEffect()
 
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -55,11 +59,13 @@ fun SummaryScreen(viewModel: MainViewModel) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "恭喜你完成任务",
+                text = summaryMessage ?: "恭喜你，现在你可以静下心去实现你的目标了",
                 fontSize = 24.sp,
                 fontWeight = FontWeight(600),
                 color = Color(0xFF212121),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp,
+                modifier = Modifier.fillMaxWidth(0.9f)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
