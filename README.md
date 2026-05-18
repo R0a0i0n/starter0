@@ -1,6 +1,5 @@
 <div align="center">
   <!-- 占位图：Hero Banner -->
-  <img src="https://via.placeholder.com/1200x500/F8F9FA/343A40?text=Rolling+Start+Hero+Banner" alt="Rolling Start Banner" width="100%">
 
   <h1>启动执行力 App (Rolling Start)</h1>
   
@@ -73,13 +72,11 @@
 
 ### 3. AI 拆解任务，分步推进
 <div align="center">
-  <img src="https://via.placeholder.com/800x450/F8F9FA/4CAF50?text=AI+Goal+Breakdown+Illustration" alt="AI Goal Breakdown" width="80%">
 </div>
 AI 会将目标拆解为固定的 6 张卡片（前 5 张为小任务，第 6 张为最终目标）。每张卡片只展示当前最适合执行的一步，用户不用一次想很多，只需要专注当下这一小步。
 
 ### 4. 滑动卡片交互，操作直观
 <div align="center">
-  <img src="https://via.placeholder.com/800x450/F8F9FA/2196F3?text=Swipe+and+Execute+Illustration" alt="Swipe Interaction" width="80%">
 </div>
 类似 Tinder 的手势操作：**向上滑表示“完成”，向下滑表示“换一个”**。
 滑动过程中界面会显示不同颜色的渐变反馈，这种交互形式比普通按钮更轻松，也更有参与感。
