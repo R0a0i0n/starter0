@@ -1,7 +1,7 @@
 <div align="center">
   <!-- 占位图：Hero Banner -->
 
-  <h1>启动执行力 App (Rolling Start)</h1>
+  <h1>启动执行力 App (Starter)</h1>
   
   <p>
     <b>一款帮助你“马上开始行动”的轻量化安卓应用</b>
